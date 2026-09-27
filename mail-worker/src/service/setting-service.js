@@ -66,6 +66,25 @@ const settingService = {
 		return setting;
 	},
 
+	async apiInfo(c) {
+
+		const settingRow = await this.query(c);
+
+		let apiBase = '';
+		try {
+			apiBase = new URL(c.req.url).origin;
+		} catch (error) {
+			apiBase = '';
+		}
+
+		return {
+			apiBase: apiBase,
+			emailListPath: '/public/emailList',
+			publicToken: (await c.env.kv.get(KvConst.PUBLIC_KEY)) || '',
+			domainList: settingRow.domainList.map(item => item.startsWith('@') ? item.slice(1) : item)
+		};
+	},
+
 	async get(c, showSiteKey = false) {
 
 		const [settingRow, recordList] = await Promise.all([

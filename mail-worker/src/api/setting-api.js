@@ -13,6 +13,11 @@ app.get('/setting/query', async (c) => {
 	return c.json(result.ok(setting));
 });
 
+app.get('/setting/apiInfo', async (c) => {
+	const apiInfo = await settingService.apiInfo(c);
+	return c.json(result.ok(apiInfo));
+});
+
 app.get('/setting/websiteConfig', async (c) => {
 	const setting = await settingService.websiteConfig(c);
 	return c.json(result.ok(setting));

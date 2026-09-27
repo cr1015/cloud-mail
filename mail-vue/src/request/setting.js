@@ -8,6 +8,10 @@ export function settingQuery() {
     return http.get('/setting/query')
 }
 
+export function apiInfoQuery() {
+    return http.get('/setting/apiInfo')
+}
+
 export function websiteConfig() {
     return http.get('/setting/websiteConfig')
 }

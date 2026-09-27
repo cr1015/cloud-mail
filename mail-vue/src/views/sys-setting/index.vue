@@ -273,6 +273,55 @@
             </div>
           </div>
 
+          <!-- Public API Card -->
+          <div class="settings-card" v-perm="'setting:query'">
+            <div class="card-title">
+              {{ $t('publicApi') }}
+              <el-tooltip effect="dark" :content="$t('publicApiDesc')">
+                <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+              </el-tooltip>
+            </div>
+            <div class="card-content">
+              <div class="setting-item">
+                <div><span>{{ $t('apiBaseUrl') }}</span></div>
+                <div class="bot-verify">
+                  <span>{{ apiInfo.apiBase || '-' }}</span>
+                  <el-button class="opt-button" size="small" type="primary" @click="copyText(apiInfo.apiBase)">
+                    <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div><span>{{ $t('emailListApi') }}</span></div>
+                <div class="bot-verify">
+                  <span>{{ apiInfo.apiBase ? apiInfo.apiBase + apiInfo.emailListPath : '-' }}</span>
+                  <el-button class="opt-button" size="small" type="primary"
+                             @click="copyText(apiInfo.apiBase ? apiInfo.apiBase + apiInfo.emailListPath : '')">
+                    <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div><span>{{ $t('publicToken') }}</span></div>
+                <div class="bot-verify">
+                  <span>{{ apiInfo.publicToken || $t('notGenerated') }}</span>
+                  <el-button class="opt-button" size="small" type="primary" @click="copyText(apiInfo.publicToken)">
+                    <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div><span>{{ $t('receiveDomains') }}</span></div>
+                <div class="bot-verify">
+                  <span>{{ apiInfo.domainList.join(', ') || '-' }}</span>
+                  <el-button class="opt-button" size="small" type="primary" @click="copyText(apiInfo.domainList.join(','))">
+                    <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Object Storage Card -->
           <div class="settings-card">
             <div class="card-title">{{ $t('oss') }}</div>
@@ -933,7 +982,7 @@ Authorization: &lt;secret&gt;</pre>
 
 <script setup>
 import {computed, defineOptions, nextTick, reactive, ref} from "vue";
-import {deleteBackground, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
+import {apiInfoQuery, deleteBackground, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
 import {useSettingStore} from "@/store/setting.js";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
@@ -943,6 +992,7 @@ import {cvtR2Url, toOssDomain} from "@/utils/convert.js";
 import {storeToRefs} from "pinia";
 import {debounce} from 'lodash-es'
 import {isDomain, isEmail, isIpUrl} from "@/utils/verify-utils.js";
+import {hasPerm} from "@/perm/perm.js";
 import loading from "@/components/loading/index.vue";
 import {getTextWidth} from "@/utils/text.js";
 import {fileToBase64} from "@/utils/file-utils.js"
@@ -1093,6 +1143,34 @@ const ruleEmail = ref([])
 const tgMsgFrom = ref('')
 const tgMsgTo = ref('')
 const tgMsgText = ref('')
+const apiInfo = ref({
+  apiBase: '',
+  emailListPath: '',
+  publicToken: '',
+  domainList: []
+})
+
+if (hasPerm('setting:query')) {
+  apiInfoQuery().then(data => {
+    apiInfo.value = {
+      apiBase: data?.apiBase || '',
+      emailListPath: data?.emailListPath || '',
+      publicToken: data?.publicToken || '',
+      domainList: Array.isArray(data?.domainList) ? data.domainList : []
+    }
+  }).catch(() => {})
+}
+
+function copyText(text) {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    ElMessage({
+      message: t('copySuccessMsg'),
+      type: 'success',
+      plain: true
+    })
+  })
+}
 
 const tgMsgFromOption = [{label: t('show'), value: 'show'}, {label: t('hide'), value: 'hide'}, {label: t('onlyName'), value:'only-name'}]
 const tgMsgToOption = [{label: t('show'), value: 'show'}, {label: t('hide'), value: 'hide'}]
