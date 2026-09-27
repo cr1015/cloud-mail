@@ -80,7 +80,7 @@ const settingService = {
 
 		return {
 			apiBase: apiBase,
-			emailListPath: '/public/emailList',
+			emailListPath: '/api/public/emailList',
 			publicToken: (await c.env.kv.get(KvConst.PUBLIC_KEY)) || '',
 			domainList: settingRow.domainList.map(item => item.startsWith('@') ? item.slice(1) : item)
 		};
