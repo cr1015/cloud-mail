@@ -12,6 +12,10 @@ export function apiInfoQuery() {
     return http.get('/setting/apiInfo')
 }
 
+export function genPublicToken() {
+    return http.post('/setting/genPublicToken')
+}
+
 export function websiteConfig() {
     return http.get('/setting/websiteConfig')
 }

@@ -1,4 +1,5 @@
 import KvConst from '../const/kv-const';
+import { v4 as uuidv4 } from 'uuid';
 import setting from '../entity/setting';
 import orm from '../entity/orm';
 import {verifyRecordType} from '../const/entity-const';
@@ -83,6 +84,12 @@ const settingService = {
 			publicToken: (await c.env.kv.get(KvConst.PUBLIC_KEY)) || '',
 			domainList: settingRow.domainList.map(item => item.startsWith('@') ? item.slice(1) : item)
 		};
+	},
+
+	async genPublicToken(c) {
+		const uuid = uuidv4();
+		await c.env.kv.put(KvConst.PUBLIC_KEY, uuid);
+		return uuid;
 	},
 
 	async get(c, showSiteKey = false) {

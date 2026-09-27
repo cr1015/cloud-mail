@@ -305,9 +305,14 @@
                 <div><span>{{ $t('publicToken') }}</span></div>
                 <div class="bot-verify">
                   <span>{{ apiInfo.publicToken || $t('notGenerated') }}</span>
-                  <el-button class="opt-button" size="small" type="primary" @click="copyText(apiInfo.publicToken)">
-                    <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
-                  </el-button>
+                  <div class="token-actions">
+                    <el-button class="opt-button" size="small" type="primary" @click="genPublicTokenConfirm">
+                      <Icon icon="material-symbols:add-rounded" width="18" height="18"/>
+                    </el-button>
+                    <el-button class="opt-button" size="small" type="primary" @click="copyText(apiInfo.publicToken)">
+                      <Icon icon="fluent-color:clipboard-24" width="18" height="18"/>
+                    </el-button>
+                  </div>
                 </div>
               </div>
               <div class="setting-item">
@@ -982,7 +987,7 @@ Authorization: &lt;secret&gt;</pre>
 
 <script setup>
 import {computed, defineOptions, nextTick, reactive, ref} from "vue";
-import {apiInfoQuery, deleteBackground, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
+import {apiInfoQuery, deleteBackground, genPublicToken, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
 import {useSettingStore} from "@/store/setting.js";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
@@ -1168,6 +1173,27 @@ function copyText(text) {
       message: t('copySuccessMsg'),
       type: 'success',
       plain: true
+    })
+  })
+}
+
+function genPublicTokenConfirm() {
+  ElMessageBox.confirm(t('genPublicTokenConfirm'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    type: 'warning'
+  }).then(() => {
+    if (settingLoading.value) return
+    settingLoading.value = true
+    genPublicToken().then(token => {
+      apiInfo.value.publicToken = token || ''
+      ElMessage({
+        message: t('saveSuccessMsg'),
+        type: 'success',
+        plain: true
+      })
+    }).finally(() => {
+      settingLoading.value = false
     })
   })
 }
@@ -2167,6 +2193,10 @@ function editSetting(settingForm, refreshStatus = true) {
     width: 48px;
     margin: 0 0 0 10px;
   }
+}
+
+.token-actions {
+  display: flex;
 }
 
 .forward-set-body {

@@ -18,6 +18,11 @@ app.get('/setting/apiInfo', async (c) => {
 	return c.json(result.ok(apiInfo));
 });
 
+app.post('/setting/genPublicToken', async (c) => {
+	const token = await settingService.genPublicToken(c);
+	return c.json(result.ok(token));
+});
+
 app.get('/setting/websiteConfig', async (c) => {
 	const setting = await settingService.websiteConfig(c);
 	return c.json(result.ok(setting));
