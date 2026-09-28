@@ -3,11 +3,11 @@ import emailUtils from '../utils/email-utils';
 import {emailConst} from "../const/entity-const";
 
 const dbInit = {
-	async init(c) {
+	async init(c, internal = false) {
 
 		const secret = c.req.param('secret');
 
-		if (secret !== c.env.jwt_secret) {
+		if (!internal && secret !== c.env.jwt_secret) {
 			return c.text('❌ JWT secret mismatch');
 		}
 

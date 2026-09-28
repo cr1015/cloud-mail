@@ -16,6 +16,10 @@ export function genPublicToken() {
     return http.post('/setting/genPublicToken')
 }
 
+export function initDatabase() {
+    return http.post('/setting/initDatabase')
+}
+
 export function websiteConfig() {
     return http.get('/setting/websiteConfig')
 }

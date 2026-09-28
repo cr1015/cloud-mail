@@ -327,6 +327,27 @@
             </div>
           </div>
 
+          <!-- Database Maintenance Card -->
+          <div class="settings-card" v-perm="'setting:query'">
+            <div class="card-title">
+              {{ $t('databaseMaintain') }}
+              <el-tooltip effect="dark" :content="$t('databaseMaintainDesc')">
+                <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+              </el-tooltip>
+            </div>
+            <div class="card-content">
+              <div class="setting-item">
+                <div><span>{{ $t('databaseUpdate') }}</span></div>
+                <div class="forward">
+                  <span class="db-update-desc">{{ $t('databaseUpdateDesc') }}</span>
+                  <el-button class="opt-button" size="small" type="primary" :loading="dbInitLoading" @click="initDatabaseConfirm">
+                    <Icon icon="lsicon:circle-upgrade-outline" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Object Storage Card -->
           <div class="settings-card">
             <div class="card-title">{{ $t('oss') }}</div>
@@ -987,7 +1008,7 @@ Authorization: &lt;secret&gt;</pre>
 
 <script setup>
 import {computed, defineOptions, nextTick, reactive, ref} from "vue";
-import {apiInfoQuery, deleteBackground, genPublicToken, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
+import {apiInfoQuery, deleteBackground, genPublicToken, initDatabase, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
 import {useSettingStore} from "@/store/setting.js";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
@@ -1194,6 +1215,29 @@ function genPublicTokenConfirm() {
       })
     }).finally(() => {
       settingLoading.value = false
+    })
+  })
+}
+
+const dbInitLoading = ref(false)
+
+function initDatabaseConfirm() {
+  ElMessageBox.confirm(t('databaseUpdateConfirm'), {
+    confirmButtonText: t('confirm'),
+    cancelButtonText: t('cancel'),
+    type: 'warning'
+  }).then(() => {
+    if (dbInitLoading.value) return
+    dbInitLoading.value = true
+    initDatabase().then(() => {
+      ElMessage({
+        message: t('databaseUpdateSuccessMsg'),
+        type: 'success',
+        plain: true
+      })
+      getSettings()
+    }).finally(() => {
+      dbInitLoading.value = false
     })
   })
 }
@@ -2197,6 +2241,13 @@ function editSetting(settingForm, refreshStatus = true) {
 
 .token-actions {
   display: flex;
+}
+
+.db-update-desc {
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  margin-right: 10px;
 }
 
 .forward-set-body {
